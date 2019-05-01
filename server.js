@@ -37,8 +37,13 @@ app.get('/location', (request, response) => {
 app.get('/weather', (request, response) => {
   try {
     const queryWeatherData = request.query.data;
-    const weatherData = getWeather(queryWeatherData);
-    response.send(weatherData);
+    const weatherDataURL = getWeather(queryWeatherData);
+    superaagent
+      .get(weatherDataURL)
+      .end((error, darkSkyApiResponse) => {
+        let weather = darkSkyApiResponse.body.daily.data.map(x => new Weather(x));
+        response.send(weather);
+      }) ;
   }
   catch(error) {
     console.error(error);
@@ -56,14 +61,7 @@ function Location(query, res) {
 }
 
 function getWeather(request) {
-  const weatherURL = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${request.latitude},${request.longitude}`;
-  console.log(weatherURL);
-  // const darkskyData = require('./data/darksky.json');
-
-
-  
-
-  return weatherURL.daily.data.map(x => new Weather(x));
+  return `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${request.latitude},${request.longitude}`;
 }
 
 function Weather(day) {
