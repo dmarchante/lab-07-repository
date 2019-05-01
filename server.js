@@ -19,7 +19,7 @@ app.get('/location', (request, response) => {
   try {
     const queryData = request.query.data;
     const geocodeURL = `https://maps.googleapis.com/maps/api/geocode/json?address=${queryData}&key=${process.env.GOOGLE_MAPS_API_KEY}`;
-
+    console.log(geocodeURL);
     superaagent
       .get(geocodeURL)
       .end((error, googleMapsApiResponse) => {
@@ -51,8 +51,8 @@ app.get('/weather', (request, response) => {
 function Location(query, res) {
   this.search_query = query;
   this.formatted_query = res.results[0].formatted_address;
-  this.Latitude = res.results[0].geometry.location.lat;
-  this.Longitude = res.results[0].geometry.location.lng;
+  this.latitude = res.results[0].geometry.location.lat;
+  this.longitude = res.results[0].geometry.location.lng;
 }
 
 function getWeather() {
