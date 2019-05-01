@@ -55,16 +55,14 @@ function Location(query, res) {
   this.longitude = res.results[0].geometry.location.lng;
 }
 
-function getWeather() {
+function getWeather(request) {
+  console.log(request);
+  // const queryData = request.query.data;
+  // const geocodeURL = `https://maps.googleapis.com/maps/api/geocode/json?address=${queryData}&key=${process.env.GOOGLE_MAPS_API_KEY}`;
+
   const darkskyData = require('./data/darksky.json');
 
-  const weatherSummaries = [];
-
-  darkskyData.daily.data.forEach(day => {
-    weatherSummaries.push(new Weather(day));
-  });
-
-  return weatherSummaries;
+  return darkskyData.daily.data.map(x => new Weather(x));
 }
 
 function Weather(day) {
