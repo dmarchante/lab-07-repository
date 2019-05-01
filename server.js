@@ -37,7 +37,7 @@ app.get('/location', (request, response) => {
 app.get('/weather', (request, response) => {
   try {
     const queryWeatherData = request.query.data;
-    const weatherDataURL = getWeather(queryWeatherData);
+    const weatherDataURL = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${queryWeatherData.latitude},${queryWeatherData.longitude}`;
     superaagent
       .get(weatherDataURL)
       .end((error, darkSkyApiResponse) => {
@@ -58,10 +58,6 @@ function Location(query, res) {
   this.formatted_query = res.results[0].formatted_address;
   this.latitude = res.results[0].geometry.location.lat;
   this.longitude = res.results[0].geometry.location.lng;
-}
-
-function getWeather(request) {
-  return `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${request.latitude},${request.longitude}`;
 }
 
 function Weather(day) {
