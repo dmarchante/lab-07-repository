@@ -18,8 +18,7 @@ app.use(cors());
 app.get('/location', (request, response) => {
   try {
     const queryData = request.query.data;
-    const geocodeURL = `https://maps.googleapis.com/maps/api/geocode/json?address=${queryData}&key=${process.env.GOOGLE_MAPS_API_KEY}`;
-    console.log(geocodeURL);
+    const geocodeURL = `https://maps.googleapis.com/maps/api/geocode/json?address=${queryData}&key=${process.env.GEOCODE_API_KEY}`;
     superaagent
       .get(geocodeURL)
       .end((error, googleMapsApiResponse) => {
@@ -37,7 +36,8 @@ app.get('/location', (request, response) => {
 
 app.get('/weather', (request, response) => {
   try {
-    const weatherData = getWeather();
+    const queryWeatherData = request.query.data;
+    const weatherData = getWeather(queryWeatherData);
     response.send(weatherData);
   }
   catch(error) {
@@ -56,13 +56,14 @@ function Location(query, res) {
 }
 
 function getWeather(request) {
-  console.log(request);
-  // const queryData = request.query.data;
-  // const geocodeURL = `https://maps.googleapis.com/maps/api/geocode/json?address=${queryData}&key=${process.env.GOOGLE_MAPS_API_KEY}`;
+  const weatherURL = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${request.latitude},${request.longitude}`;
+  console.log(weatherURL);
+  // const darkskyData = require('./data/darksky.json');
 
-  const darkskyData = require('./data/darksky.json');
 
-  return darkskyData.daily.data.map(x => new Weather(x));
+  
+
+  return weatherURL.daily.data.map(x => new Weather(x));
 }
 
 function Weather(day) {
