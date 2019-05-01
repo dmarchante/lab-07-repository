@@ -84,7 +84,6 @@ function Event(event) {
   this.link = event.url;
   this.name = event.name.text;
   this.event_date = event.start.local.slice(0, 10);
-  // this.event_date = new Date(event.start.local * 1000).toString().slice(0, 15);
   this.summary = event.summary;
 }
 
