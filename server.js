@@ -52,15 +52,12 @@ app.get('/weather', (request, response) => {
 app.get('/events', (request, response) => {
   try {
     const eventData = request.query.data;
-    const eventDataURL = `https://www.eventbriteapi.com/v3/events/search?location.longitude=${eventData.longitude}&${eventData.latitude}${process.env.EVENTBRITE_API_KEY}`;
-    superaagent
-      .get(eventDataURL)
+    const eventDataURL = `https://www.eventbriteapi.com/v3/events/search?location.longitude=${eventData.longitude}&location.latitude=${eventData.latitude}`;
+    superaagent.get(eventDataURL)
       .set({Authorization: `Bearer ${process.env.EVENTBRITE_API_KEY}`})
       .end((error, eventBriteApiResponse) => {
-        console.log(eventDataURL);
-        // console.log(eventBriteApiResponse);
-        let event = eventBriteApiResponse.body.daily.data.map(x => new Event(x));
-        response.send(event);
+        let events = eventBriteApiResponse.body.events.map(x => new Event(x));
+        response.send(events);
       }) ;
   }
   catch(error) {
@@ -84,9 +81,10 @@ function Weather(day) {
 }
 
 function Event(event) {
-  this.link = event.link;
-  this.name = event.name;
-  this.event_date = new Date(event.time * 1000).toString().slice(0, 15);
+  this.link = event.url;
+  this.name = event.name.text;
+  this.event_date = event.start.local.slice(0, 10);
+  // this.event_date = new Date(event.start.local * 1000).toString().slice(0, 15);
   this.summary = event.summary;
 }
 
