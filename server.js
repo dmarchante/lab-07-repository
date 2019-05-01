@@ -25,8 +25,6 @@ app.get('/location', (request, response) => {
         const location = new Location(queryData, googleMapsApiResponse.body);
         response.send(location);
       });
-
-    // console.log('geoData is', geocodingURL);
   }
   catch(error) {
     console.error(error);
@@ -51,6 +49,26 @@ app.get('/weather', (request, response) => {
   }
 });
 
+app.get('/events', (request, response) => {
+  try {
+    const eventData = request.query.data;
+    const eventDataURL = `https://www.eventbriteapi.com/v3/events/search?location.longitude=${eventData.longitude}&${eventData.latitude}${process.env.EVENTBRITE_API_KEY}`;
+    superaagent
+      .get(eventDataURL)
+      .set({Authorization: `Bearer ${process.env.EVENTBRITE_API_KEY}`})
+      .end((error, eventBriteApiResponse) => {
+        console.log(eventDataURL);
+        // console.log(eventBriteApiResponse);
+        let event = eventBriteApiResponse.body.daily.data.map(x => new Event(x));
+        response.send(event);
+      }) ;
+  }
+  catch(error) {
+    console.error(error);
+    response.status(500).send('Status: 500. So sorry, something went wrong.');
+  }
+});
+
 // Helper Functions
 
 function Location(query, res) {
@@ -63,6 +81,13 @@ function Location(query, res) {
 function Weather(day) {
   this.forecast = day.summary;
   this.time = new Date(day.time * 1000).toString().slice(0, 15);
+}
+
+function Event(event) {
+  this.link = event.link;
+  this.name = event.name;
+  this.event_date = new Date(event.time * 1000).toString().slice(0, 15);
+  this.summary = event.summary;
 }
 
 // Make sure the server is listening for requests
